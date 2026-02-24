@@ -38,7 +38,7 @@
   // Redirect after 80 seconds
   setTimeout(() => {
     console.log("[step2] Redirecting...");
-    window.location.href = "https://craxpro.io/forums/proxies-http-https-socks4-socks5/post-thread";
+    window.location.href = "https://craxpro.to/forums/proxies-http-https-socks4-socks5/post-thread";
   }, 80000);
 
 })();
