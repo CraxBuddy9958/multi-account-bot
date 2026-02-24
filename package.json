@@ -1,0 +1,10 @@
+{
+  "name": "multi-account-bot",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node run.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.0.0"
+  }
+}
