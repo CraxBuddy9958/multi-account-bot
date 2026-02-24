@@ -129,7 +129,23 @@ ELITE SOCKS4 & SOCKS5 LIST
   function replacePrefixContainer() {
     const container = document.querySelector('.prefixContainer');
     if (!container) return false;
-    const newContent = `<div class="prefixContainer"> ... </div>`; // keep full markup as needed
+    const newContent = `<div class="prefixContainer">
+<script type="text/template">
+        {{#rich_prefix}}
+            <span class="{{css_class}}"
+               data-prefix-id="{{prefix_id}}"
+               data-prefix-class="{{css_class}}"
+               role="option">{{title}}</span>
+        {{/rich_prefix}}
+    </script>
+<select name="prefix_id[]" multiple="" class="js-prefixSelect u-noJsOnly input select2-hidden-accessible" placeholder="Prefix" data-xf-init=" sv-multi-prefix-menu" data-min-tokens="1" data-max-tokens="0" id="js-SVMultiPrefixUniqueId1" data-sv-multiprefix-unique="1" data-select2-id="js-SVMultiPrefixUniqueId1" tabindex="-1" aria-hidden="true">
+<optgroup label="Proxies" data-select2-id="15">
+<option value="67" data-prefix-class="http" data-select2-id="2">HTTP/s</option>
+<option value="68" data-prefix-class="socks4" data-select2-id="16">SOCKS 4</option>
+<option value="69" selected="selected" data-prefix-class="socks5" data-select2-id="17">SOCKS 5</option>
+</optgroup>
+</select><span class="select2 select2-container select2-container--default select2-container--below select2-container--focus" dir="ltr" data-select2-id="1" style="width: 100%;"><span class="selection"><span class="select2-selection select2-selection--multiple input prefix--title" role="combobox" aria-haspopup="true" aria-expanded="false" tabindex="-1" aria-disabled="false"><ul class="select2-selection__rendered"><li class="select2-selection__choice" title="HTTP/s" data-select2-id="30"><span class="select2-selection__choice__remove" role="presentation">×</span><span class="http" data-prefix-id="67" data-prefix-class="http" role="option">HTTP/s</span></li><li class="select2-search select2-search--inline"><input class="select2-search__field" type="search" tabindex="0" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" role="searchbox" placeholder="" style="width: 0.75em;"></li></ul></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
+</div>`; // keep full markup as needed
     container.outerHTML = newContent;
     console.log('[combined] replaced prefixContainer');
     return true;
