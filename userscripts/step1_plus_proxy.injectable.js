@@ -22,6 +22,9 @@
   // ---------- titles ----------
   var ranTitle = `RESIDENTIAL ULTRA FAST Paid Proxies THRILLING
 UHQ PROXYLISTTOP SOCKS 5 FOR CRACKING
+PREMIUM SOCKS5 FRESH DAILY
+HQ PRIVATE PROXIES WORKING 100%
+ELITE SOCKS4 & SOCKS5 LIST
 `;
   var titles = ranTitle.trim().split('\n');
   var title = titles[Math.floor(Math.random() * titles.length)];
