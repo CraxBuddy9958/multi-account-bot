@@ -1,4 +1,15 @@
-// scheduler.js - 25-hour cycle scheduler
+// ============================================
+// 25-HOUR CYCLE SCHEDULER - EASY TIME CONFIG
+// ============================================
+
+// ⚡⚡⚡ EDIT THESE 2 LINES TO CHANGE START TIME ⚡⚡⚡
+const START_HOUR_IST = 22;      // 0-23 (22 = 10 PM)
+const START_MINUTE_IST = 20;    // 0-59 (20 = 20 minutes)
+
+// ============================================
+// DON'T TOUCH BELOW THIS LINE
+// ============================================
+
 const { spawn } = require('child_process');
 const fs = require('fs');
 
@@ -9,31 +20,28 @@ function log(message) {
   const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
   const logMsg = `[${timestamp} IST] ${message}`;
   console.log(logMsg);
-  fs.appendFileSync('scheduler.log', logMsg + '\n');
+  fs.appendFileSync('/tmp/scheduler.log', logMsg + '\n');
 }
 
 function runBot() {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     log('🚀 Starting bot for 1 hour...');
     
     const bot = spawn('node', ['run.js'], {
       stdio: 'inherit',
-      env: process.env
+      env: { ...process.env, FORCE_COLOR: '1' }
     });
+
+    // Safety kill after 65 minutes
+    const safetyTimeout = setTimeout(() => {
+      log('⏰ Safety timeout - killing bot');
+      bot.kill('SIGTERM');
+    }, 65 * 60 * 1000);
 
     bot.on('close', (code) => {
-      if (code === 0) {
-        log('✅ Bot completed successfully');
-        resolve();
-      } else {
-        log(`❌ Bot exited with code ${code}`);
-        reject(new Error(`Exit code ${code}`));
-      }
-    });
-
-    bot.on('error', (err) => {
-      log(`💥 Failed to start bot: ${err.message}`);
-      reject(err);
+      clearTimeout(safetyTimeout);
+      log(`✅ Bot finished (code ${code})`);
+      resolve();
     });
   });
 }
@@ -43,40 +51,37 @@ async function sleep(ms) {
 }
 
 async function main() {
-  log('📅 25-Hour Cycle Scheduler Started');
-  log('⏰ First run starting immediately...');
+  log('📅 25-Hour Cycle Scheduler');
+  log(`⚡ Configured start time: ${START_HOUR_IST}:${START_MINUTE_IST.toString().padStart(2, '0')} PM IST`);
   
-  // Optional: Wait until specific IST time for first run
-  // Uncomment below to start at specific time (e.g., 10:20 PM IST)
-  /*
+  // Calculate first run time in IST
   const now = new Date();
-  const targetHour = 22; // 10 PM
-  const targetMin = 20;
-  const istNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-  const target = new Date(istNow);
-  target.setHours(targetHour, targetMin, 0, 0);
+  const istTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
   
-  if (target <= istNow) {
+  let target = new Date(istTime);
+  target.setHours(START_HOUR_IST, START_MINUTE_IST, 0, 0);
+  
+  // If target time already passed today, move to tomorrow
+  if (target <= istTime) {
     target.setDate(target.getDate() + 1);
   }
   
-  const waitMs = target - istNow;
-  log(`⏳ Waiting until ${target.toLocaleString('en-IN', {timeZone: 'Asia/Kolkata'})} IST`);
-  await sleep(waitMs);
-  */
+  const waitMs = target.getTime() - istTime.getTime();
+  const waitHours = Math.floor(waitMs / (1000 * 60 * 60));
+  const waitMinutes = Math.floor((waitMs % (1000 * 60 * 60)) / (1000 * 60));
   
+  log(`⏳ First run in ${waitHours}h ${waitMinutes}m`);
+  log(`📅 First run at: ${target.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST`);
+  
+  await sleep(waitMs);
+  
+  // Main loop
   while (true) {
-    try {
-      await runBot();
-    } catch (error) {
-      log(`⚠️ Error: ${error.message}`);
-      log('🔄 Retrying in 5 minutes...');
-      await sleep(5 * 60 * 1000);
-      continue;
-    }
+    await runBot();
     
-    log('😴 Bot finished. Sleeping for 25 hours...');
-    log(`⏰ Next run at: ${new Date(Date.now() + TWENTY_FIVE_HOURS_MS).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST`);
+    const nextRun = new Date(Date.now() + TWENTY_FIVE_HOURS_MS);
+    log(`😴 Sleeping 25 hours`);
+    log(`⏰ Next run: ${nextRun.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST`);
     
     await sleep(TWENTY_FIVE_HOURS_MS);
   }
