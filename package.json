@@ -1,7 +1,6 @@
 {
   "name": "multi-account-bot",
   "version": "1.0.0",
-  "main": "run.js",
   "scripts": {
     "start": "node scheduler.js",
     "bot": "node run.js"
