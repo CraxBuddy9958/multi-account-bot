@@ -1,0 +1,29 @@
+name: Bot Scheduler
+
+on:
+  schedule:
+    - cron: '0 17 * * *'  # 10:30 PM IST daily (adjust as needed)
+  workflow_dispatch:  # Manual trigger button
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65  # 1 hour + 5 min buffer
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          
+      - name: Install dependencies
+        run: |
+          npm ci
+          # Install Chrome for Puppeteer
+          npx puppeteer browsers install chrome
+          
+      - name: Run bot
+        run: node run.js
+        env:
+          ACCOUNTS_JSON: ${{ secrets.ACCOUNTS_JSON }}
