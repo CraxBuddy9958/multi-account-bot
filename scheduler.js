@@ -4,7 +4,7 @@
 
 // ⚡⚡⚡ EDIT THESE 2 LINES TO CHANGE START TIME ⚡⚡⚡
 const START_HOUR_IST = 22;      // 0-23 (22 = 10 PM)
-const START_MINUTE_IST = 33;    // 0-59 (20 = 20 minutes)
+const START_MINUTE_IST = 37;    // 0-59 (20 = 20 minutes)
 
 // ============================================
 // DON'T TOUCH BELOW THIS LINE
