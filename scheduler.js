@@ -3,8 +3,8 @@
 // ============================================
 
 // ⚡⚡⚡ EDIT THESE 2 LINES TO CHANGE START TIME ⚡⚡⚡
-const START_HOUR_IST = 22;      // 0-23 (22 = 10 PM)
-const START_MINUTE_IST = 45;    // 0-59 (20 = 20 minutes)
+const START_HOUR_IST = 23;      // 0-23 (22 = 10 PM)
+const START_MINUTE_IST = 22;    // 0-59 (33 = 33 minutes)
 
 // ============================================
 // DON'T TOUCH BELOW THIS LINE
@@ -14,7 +14,7 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 
 const ONE_HOUR_MS = 60 * 60 * 1000;
-const TWENTY_FIVE_HOURS_MS = 25 * 60 * 60 * 1000;
+const CYCLE_HOURS_MS = 24 * 60 * 60 * 1000;  // Changed to 24 hours for daily
 
 function log(message) {
   const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
@@ -51,27 +51,31 @@ async function sleep(ms) {
 }
 
 async function main() {
-  log('📅 25-Hour Cycle Scheduler');
-  log(`⚡ Configured start time: ${START_HOUR_IST}:${START_MINUTE_IST.toString().padStart(2, '0')} PM IST`);
+  log('📅 24-Hour Daily Scheduler');
+  log(`⚡ Configured start time: ${START_HOUR_IST}:${START_MINUTE_IST.toString().padStart(2, '0')} IST`);
   
-  // Calculate first run time in IST
+  // Get current time in IST
   const now = new Date();
-  const istTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+  const istOptions = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', 
+                       hour12: false, day: '2-digit', month: '2-digit', year: 'numeric' };
+  const istStr = now.toLocaleString('en-IN', istOptions);
   
-  let target = new Date(istTime);
-  target.setHours(START_HOUR_IST, START_MINUTE_IST, 0, 0);
+  // Calculate target time
+  const nowIST = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+  const targetIST = new Date(nowIST);
+  targetIST.setHours(START_HOUR_IST, START_MINUTE_IST, 0, 0);
   
   // If target time already passed today, move to tomorrow
-  if (target <= istTime) {
-    target.setDate(target.getDate() + 1);
+  if (targetIST <= nowIST) {
+    targetIST.setDate(targetIST.getDate() + 1);
   }
   
-  const waitMs = target.getTime() - istTime.getTime();
+  const waitMs = targetIST - nowIST;
   const waitHours = Math.floor(waitMs / (1000 * 60 * 60));
   const waitMinutes = Math.floor((waitMs % (1000 * 60 * 60)) / (1000 * 60));
   
   log(`⏳ First run in ${waitHours}h ${waitMinutes}m`);
-  log(`📅 First run at: ${target.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST`);
+  log(`📅 First run at: ${targetIST.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST`);
   
   await sleep(waitMs);
   
@@ -79,11 +83,11 @@ async function main() {
   while (true) {
     await runBot();
     
-    const nextRun = new Date(Date.now() + TWENTY_FIVE_HOURS_MS);
-    log(`😴 Sleeping 25 hours`);
+    const nextRun = new Date(Date.now() + CYCLE_HOURS_MS);
+    log(`😴 Sleeping 24 hours until next run`);
     log(`⏰ Next run: ${nextRun.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST`);
     
-    await sleep(TWENTY_FIVE_HOURS_MS);
+    await sleep(CYCLE_HOURS_MS);
   }
 }
 
