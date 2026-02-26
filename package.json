@@ -2,8 +2,9 @@
   "name": "multi-account-bot",
   "version": "1.0.0",
   "scripts": {
-    "start": "node run.js",
-    "bot": "node run.js"
+    "start": "node scheduler.js",
+    "bot": "node run.js",
+    "scheduler": "node scheduler.js"
   },
   "dependencies": {
     "puppeteer": "^23.11.1",
