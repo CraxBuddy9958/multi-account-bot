@@ -1,10 +1,10 @@
 // ============================================
-// 25-HOUR CYCLE SCHEDULER - EASY TIME CONFIG
+// CUSTOM LAUNCH TIME + 25-HOUR CYCLE SCHEDULER
 // ============================================
 
-// ⚡⚡⚡ EDIT THESE 2 LINES TO CHANGE START TIME ⚡⚡⚡
-const START_HOUR_IST = 23;      // 0-23 (22 = 10 PM)
-const START_MINUTE_IST = 22;    // 0-59 (33 = 33 minutes)
+// ⚡⚡⚡ SET YOUR LAUNCH TIME HERE (IST) ⚡⚡⚡
+const LAUNCH_HOUR_IST = 23;      // 23 = 11 PM
+const LAUNCH_MINUTE_IST = 27;    // 27 minutes = 11:27 PM IST
 
 // ============================================
 // DON'T TOUCH BELOW THIS LINE
@@ -14,7 +14,7 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 
 const ONE_HOUR_MS = 60 * 60 * 1000;
-const CYCLE_HOURS_MS = 24 * 60 * 60 * 1000;  // Changed to 24 hours for daily
+const CYCLE_HOURS_MS = 25 * 60 * 60 * 1000;  // 25 hours
 
 function log(message) {
   const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
@@ -50,42 +50,49 @@ async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function main() {
-  log('📅 24-Hour Daily Scheduler');
-  log(`⚡ Configured start time: ${START_HOUR_IST}:${START_MINUTE_IST.toString().padStart(2, '0')} IST`);
+function getTimeUntilLaunch() {
+  const now = new Date();
   
   // Get current time in IST
-  const now = new Date();
-  const istOptions = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', 
-                       hour12: false, day: '2-digit', month: '2-digit', year: 'numeric' };
-  const istStr = now.toLocaleString('en-IN', istOptions);
-  
-  // Calculate target time
   const nowIST = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-  const targetIST = new Date(nowIST);
-  targetIST.setHours(START_HOUR_IST, START_MINUTE_IST, 0, 0);
   
-  // If target time already passed today, move to tomorrow
+  // Create target time for today in IST
+  const targetIST = new Date(nowIST);
+  targetIST.setHours(LAUNCH_HOUR_IST, LAUNCH_MINUTE_IST, 0, 0);
+  
+  // If target time already passed today, schedule for tomorrow
   if (targetIST <= nowIST) {
     targetIST.setDate(targetIST.getDate() + 1);
   }
   
-  const waitMs = targetIST - nowIST;
+  // Calculate wait time in milliseconds
+  const waitMs = targetIST.getTime() - nowIST.getTime();
+  
+  return { waitMs, targetIST };
+}
+
+async function main() {
+  log('📅 25-Hour Cycle Scheduler');
+  log(`⚡ Launch time set: ${LAUNCH_HOUR_IST}:${LAUNCH_MINUTE_IST.toString().padStart(2, '0')} IST`);
+  
+  // Calculate time until first launch
+  const { waitMs, targetIST } = getTimeUntilLaunch();
   const waitHours = Math.floor(waitMs / (1000 * 60 * 60));
   const waitMinutes = Math.floor((waitMs % (1000 * 60 * 60)) / (1000 * 60));
   
-  log(`⏳ First run in ${waitHours}h ${waitMinutes}m`);
-  log(`📅 First run at: ${targetIST.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST`);
+  log(`⏳ First launch in ${waitHours}h ${waitMinutes}m`);
+  log(`📅 Launch time: ${targetIST.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST`);
   
+  // Wait until launch time
   await sleep(waitMs);
   
-  // Main loop
+  // Main loop - run, then wait 25 hours
   while (true) {
     await runBot();
     
     const nextRun = new Date(Date.now() + CYCLE_HOURS_MS);
-    log(`😴 Sleeping 24 hours until next run`);
-    log(`⏰ Next run: ${nextRun.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST`);
+    log(`😴 Sleeping 25 hours...`);
+    log(`⏰ Next run at: ${nextRun.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST`);
     
     await sleep(CYCLE_HOURS_MS);
   }
