@@ -399,7 +399,7 @@ ELITE PROXIES |PROXIES FOR CRACKING`;
 
             // Set content
             if (targetElement.tagName === 'TEXTAREA') {
-                targetElement.value = proxies.join('\n');
+                targetElement.value = "[REPLY]\n" + proxies.join('\n') + "[/REPLY]";
             } else if (targetElement.isContentEditable || targetElement.getAttribute('contenteditable') === 'true') {
                 targetElement.innerText = proxies.join('\n');
             } else {
