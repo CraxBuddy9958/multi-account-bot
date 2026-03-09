@@ -395,31 +395,93 @@ ELITE PROXIES |PROXIES FOR CRACKING`;
     }
 
     async function findTitleField() {
+        console.log('[step1] Starting findTitleField...');
+        
+        // Expanded selectors for XenForo title field
         const selectors = [
+            // Common title input selectors
             'input[name="title"]',
             'input#title',
-            'input[placeholder*="title" i]',
-            '.titleInput input',
+            '#title',
             'input.title',
-            'input.js-title'
+            'input.js-title',
+            
+            // XenForo specific
+            '.titleInput input',
+            'input.input[name="title"]',
+            '.block-container input[name="title"]',
+            'form input[name="title"]',
+            
+            // Generic title inputs
+            'input[placeholder*="title" i]',
+            'input[placeholder*="subject" i]',
+            'input[placeholder*="thread" i]',
+            
+            // Data attributes
+            'input[data-field="title"]',
+            '[data-title-input] input',
+            
+            // Any visible text input in the form
+            'input[type="text"].input'
         ];
 
         for (const selector of selectors) {
-            const el = await waitForElement(selector, 3000);
-            if (el) return el;
+            const el = document.querySelector(selector);
+            if (el) {
+                console.log('[step1] Found title field:', selector);
+                return el;
+            }
         }
 
+        // Wait for each selector
+        for (const selector of selectors) {
+            const el = await waitForElement(selector, 1500);
+            if (el) {
+                console.log('[step1] Found title field via wait:', selector);
+                return el;
+            }
+        }
+
+        // XPath fallbacks
         const xpaths = [
             "//input[@name='title']",
             "//input[@id='title']",
-            "//input[contains(@placeholder, 'title')]"
+            "//input[contains(@placeholder, 'title')]",
+            "//input[contains(@placeholder, 'Title')]",
+            "//input[contains(@placeholder, 'subject')]",
+            "//label[contains(text(), 'Title')]/following::input[1]",
+            "//dt[contains(text(), 'Title')]/following-sibling::dd//input",
+            "//input[@type='text'][1]"
         ];
         
         for (const xpath of xpaths) {
             const el = getElementByXPath(xpath);
-            if (el) return el;
+            if (el) {
+                console.log('[step1] Found title field via XPath:', xpath);
+                return el;
+            }
         }
 
+        // Last resort: Find any text input that looks like a title field
+        console.log('[step1] Trying fallback - any text input...');
+        const allInputs = document.querySelectorAll('input[type="text"]');
+        for (const input of allInputs) {
+            const rect = input.getBoundingClientRect();
+            const name = input.name || input.id || '';
+            console.log('[step1] Checking input:', name, 'visible:', rect.width > 0);
+            if (rect.width > 100 && (name.toLowerCase().includes('title') || name === '')) {
+                console.log('[step1] Found potential title input:', input.name || input.id);
+                return input;
+            }
+        }
+
+        // Debug: Log all input elements found
+        console.log('[step1] DEBUG - Input elements on page:');
+        document.querySelectorAll('input').forEach((inp, i) => {
+            console.log(`[step1] Input ${i}: name="${inp.name}" id="${inp.id}" type="${inp.type}" placeholder="${inp.placeholder}"`);
+        });
+
+        console.warn('[step1] Title field not found');
         return null;
     }
 
@@ -546,6 +608,39 @@ ELITE PROXIES |PROXIES FOR CRACKING`;
     // ---------------------------
     // Main Functions
     // ---------------------------
+    
+    // Helper: Find hidden textarea for Froala editor
+    function findFroalaTextarea(froalaElement) {
+        // Froala usually has a textarea sibling or parent with same name/id
+        const parent = froalaElement.closest('.fr-box, .editorWrapper, .message-editorWrapper');
+        if (parent) {
+            let textarea = parent.querySelector('textarea[name="message"], textarea#message, textarea.fr-hidden, textarea');
+            if (textarea) {
+                console.log('[step1] Found Froala textarea:', textarea.name || textarea.id);
+                return textarea;
+            }
+        }
+        
+        // Try finding textarea in form
+        const form = froalaElement.closest('form');
+        if (form) {
+            let textarea = form.querySelector('textarea[name="message"], textarea#message, textarea.input');
+            if (textarea) {
+                console.log('[step1] Found textarea in form:', textarea.name || textarea.id);
+                return textarea;
+            }
+        }
+        
+        // Global search for message textarea
+        const textarea = document.querySelector('textarea[name="message"], textarea#message, textarea.input');
+        if (textarea) {
+            console.log('[step1] Found global textarea:', textarea.name || textarea.id);
+            return textarea;
+        }
+        
+        return null;
+    }
+
     async function injectProxies(retries = 5, retryDelay = 3000) {
         for (let attempt = 1; attempt <= retries; attempt++) {
             console.log(`[step1] Attempt ${attempt}/${retries} to find content area...`);
@@ -578,6 +673,12 @@ ELITE PROXIES |PROXIES FOR CRACKING`;
             targetElement.focus();
             await sleep(100);
 
+            // Find hidden textarea for form submission
+            const hiddenTextarea = findFroalaTextarea(targetElement);
+            if (hiddenTextarea) {
+                console.log('[step1] Found hidden textarea for sync:', hiddenTextarea.name || hiddenTextarea.id);
+            }
+
             // Set content based on element type
             if (targetElement.tagName === 'TEXTAREA') {
                 targetElement.value = proxyContent;
@@ -591,30 +692,67 @@ ELITE PROXIES |PROXIES FOR CRACKING`;
                     console.log('[step1] Native setter failed, continuing');
                 }
             } else if (targetElement.isContentEditable || targetElement.getAttribute('contenteditable') === 'true') {
-                // For Froala editor - need to clear existing content and set new content
-                targetElement.innerHTML = '';
-                await sleep(50);
+                // For Froala editor - need to properly set content
                 
-                // Create paragraphs for each proxy line (Froala prefers <p> tags)
-                const proxyHtml = proxies.map(p => `<p>${p}</p>`).join('');
-                targetElement.innerHTML = proxyHtml;
-                
-                // Also set innerText as backup
-                targetElement.innerText = proxyContent;
-                
-                console.log('[step1] Set content via innerHTML and innerText');
+                // Method 1: Try Froala jQuery API first (most reliable)
+                let froalaSuccess = false;
+                try {
+                    if (window.jQuery) {
+                        const $el = jQuery(targetElement);
+                        if ($el.data('froala.editor')) {
+                            // Use Froala's API to set HTML content
+                            const proxyHtml = proxies.map(p => `<p>${p}</p>`).join('');
+                            $el.froalaEditor('html.set', proxyHtml);
+                            console.log('[step1] Set content via Froala jQuery API');
+                            froalaSuccess = true;
+                        }
+                    }
+                } catch (e) {
+                    console.log('[step1] Froala jQuery API failed:', e.message);
+                }
+
+                // Method 2: Direct DOM manipulation with proper HTML structure
+                if (!froalaSuccess) {
+                    // Clear existing content
+                    targetElement.innerHTML = '';
+                    await sleep(50);
+                    
+                    // Create paragraphs for each proxy line (Froala prefers <p> tags)
+                    const proxyHtml = proxies.map(p => `<p>${p}</p>`).join('');
+                    targetElement.innerHTML = proxyHtml;
+                    
+                    console.log('[step1] Set content via innerHTML');
+                }
+
+                // CRITICAL: Sync to hidden textarea for form submission
+                if (hiddenTextarea) {
+                    // For XenForo, we need to set the textarea value with the HTML content
+                    const htmlContent = targetElement.innerHTML;
+                    hiddenTextarea.value = htmlContent;
+                    
+                    // Trigger change event on textarea
+                    hiddenTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+                    hiddenTextarea.dispatchEvent(new Event('change', { bubbles: true }));
+                    
+                    console.log('[step1] Synced content to hidden textarea, length:', hiddenTextarea.value.length);
+                }
             } else {
                 targetElement.innerHTML = proxies.map(p => `<div>${p}</div>`).join('');
             }
 
             // Trigger events - comprehensive list for various frameworks and Froala
-            await sleep(50);
+            await sleep(100);
             targetElement.focus();
-            await sleep(50);
+            await sleep(100);
             
-            const events = ['focus', 'input', 'change', 'blur', 'keyup', 'keydown', 'keypress'];
+            // Froala-specific events
+            const events = ['focus', 'input', 'change', 'blur', 'keyup', 'keydown', 'keypress', 'froalaEditor.initialized', 'froalaEditor.contentChanged'];
             for (const eventType of events) {
-                targetElement.dispatchEvent(new Event(eventType, { bubbles: true }));
+                try {
+                    targetElement.dispatchEvent(new Event(eventType, { bubbles: true }));
+                } catch (e) {
+                    // Ignore errors for custom events
+                }
             }
             
             // Dispatch InputEvent for React/modern frameworks
@@ -629,14 +767,18 @@ ELITE PROXIES |PROXIES FOR CRACKING`;
                 console.log('[step1] InputEvent dispatch failed, continuing');
             }
 
-            // For Froala, try to trigger froalaEditor events
-            try {
-                if (window.jQuery && jQuery(targetElement).data('froala.editor')) {
-                    jQuery(targetElement).froalaEditor('html.set', proxyHtml || proxyContent);
-                    console.log('[step1] Set content via Froala API');
-                }
-            } catch (e) {
-                console.log('[step1] Froala API not available or failed');
+            // Trigger blur and refocus to force Froala to sync
+            targetElement.blur();
+            await sleep(100);
+            targetElement.focus();
+            await sleep(100);
+            targetElement.blur();
+            
+            // Final sync to textarea
+            if (hiddenTextarea && targetElement.innerHTML) {
+                hiddenTextarea.value = targetElement.innerHTML;
+                hiddenTextarea.dispatchEvent(new Event('change', { bubbles: true }));
+                console.log('[step1] Final sync to textarea complete');
             }
 
             console.log(`[step1] Successfully injected ${proxies.length} proxies`);
@@ -650,10 +792,35 @@ ELITE PROXIES |PROXIES FOR CRACKING`;
     async function fillTitle() {
         const el = await findTitleField();
         if (el) {
+            // Focus the element first
+            el.focus();
+            await sleep(100);
+            
+            // Clear existing value
+            el.value = '';
+            
+            // Set new value
             el.value = title;
+            
+            // Try native setter for React frameworks
+            try {
+                const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+                if (nativeInputValueSetter) {
+                    nativeInputValueSetter.call(el, title);
+                }
+            } catch (e) {
+                console.log('[step1] Native input setter failed, continuing');
+            }
+            
+            // Trigger events
             el.dispatchEvent(new Event('input', { bubbles: true }));
             el.dispatchEvent(new Event('change', { bubbles: true }));
-            console.log('[step1] Title set');
+            el.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true }));
+            
+            // Blur to trigger validation
+            el.blur();
+            
+            console.log('[step1] Title set to:', title.substring(0, 30) + '...');
             return true;
         }
         console.warn('[step1] Title field not found');
@@ -724,11 +891,22 @@ ELITE PROXIES |PROXIES FOR CRACKING`;
 
         // Wait for page to fully load
         console.log('[step1] Waiting for page to load...');
-        await sleep(3000);
+        await sleep(4000);
 
+        // Step 1: Select prefix first
         await selectPrefix();
+        await sleep(1000);
+
+        // Step 2: Fill title BEFORE content (important for validation)
+        console.log('[step1] Filling title...');
+        const titleOk = await fillTitle();
+        if (!titleOk) {
+            console.warn('[step1] Title fill failed, but continuing...');
+        }
         await sleep(500);
 
+        // Step 3: Inject proxies
+        console.log('[step1] Injecting proxies...');
         const injectionOk = await injectProxies();
         if (!injectionOk) {
             console.error('[step1] Proxy injection failed - aborting');
@@ -736,12 +914,15 @@ ELITE PROXIES |PROXIES FOR CRACKING`;
             return;
         }
 
-        await sleep(500);
-        await fillTitle();
+        // Step 4: Wait for everything to sync
+        console.log('[step1] Waiting for form to sync...');
+        await sleep(2000);
 
+        // Step 5: Re-fill title to ensure it's set
+        await fillTitle();
         await sleep(500);
         
-        // Update localStorage BEFORE clicking submit and waiting
+        // Step 6: Update localStorage BEFORE clicking submit
         try {
             userContent = lines.slice(100).join('\n');
             localStorage.setItem('userContent', userContent);
@@ -750,6 +931,7 @@ ELITE PROXIES |PROXIES FOR CRACKING`;
             console.error('[step1] Failed to update localStorage:', e);
         }
 
+        // Step 7: Click submit
         const submitClicked = await clickSubmit();
 
         if (submitClicked) {
