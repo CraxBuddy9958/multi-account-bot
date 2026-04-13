@@ -3,7 +3,7 @@
     'use strict';
 
     // Only run on thread pages (URLs like https://craxpro.to/threads/...)
-    const THREADS_PATTERN = /https:\/\/craxpro\.to\/threads\//;
+    const THREADS_PATTERN = /https:\/\/craxpro\.org\/threads\//;
     if (!THREADS_PATTERN.test(window.location.href)) {
         console.log('[step2] Skipping - not on threads page');
         return;
