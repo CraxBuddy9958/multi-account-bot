@@ -2,7 +2,7 @@
 (function() {
     'use strict';
 
-    // Only run on thread pages (URLs like https://craxpro.to/threads/...)
+    // Only run on thread pages (URLs like https://craxpro.org/threads/...)
     const THREADS_PATTERN = /https:\/\/craxpro\.org\/threads\//;
     if (!THREADS_PATTERN.test(window.location.href)) {
         console.log('[step2] Skipping - not on threads page');
@@ -100,7 +100,7 @@
         console.log('[step2] Will redirect in 80 seconds...');
         setTimeout(() => {
             console.log("[step2] Redirecting to post-thread...");
-            window.location.href = "https://craxpro.to/forums/proxies-http-https-socks4-socks5/post-thread";
+            window.location.href = "https://craxpro.org/forums/proxies-http-https-socks4-socks5/post-thread";
         }, 80000);
     }
 
