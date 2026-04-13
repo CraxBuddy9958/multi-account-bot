@@ -3,7 +3,7 @@
     'use strict';
 
     // Only run on the post-thread page
-    const TARGET_URL = "https://craxpro.to/forums/proxies-http-https-socks4-socks5/post-thread";
+    const TARGET_URL = "https://craxpro.org/forums/proxies-http-https-socks4-socks5/post-thread";
     if (!window.location.href.startsWith(TARGET_URL)) {
         console.log('[step1] Skipping - not on post-thread page');
         return;
