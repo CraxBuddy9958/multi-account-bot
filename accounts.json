@@ -1,0 +1,70 @@
+[
+  {
+    "name": "Main",
+    "startUrl": "https://craxpro.to/forums/proxies-http-https-socks4-socks5/post-thread",
+    "cookies": [
+      {
+        "domain": ".craxpro.to",
+        "expirationDate": 1802955856.944483,
+        "hostOnly": false,
+        "httpOnly": true,
+        "name": "xf_user",
+        "path": "/",
+        "sameSite": null,
+        "secure": true,
+        "session": false,
+        "storeId": null,
+        "value": "394948%2CkoAh3232eXKfLJmEU3jx6duPVoowqawp5Zh_JVlY"
+      },
+      {
+        "domain": "craxpro.to",
+        "expirationDate": 1786971836,
+        "hostOnly": true,
+        "httpOnly": false,
+        "name": "g_state",
+        "path": "/",
+        "sameSite": null,
+        "secure": false,
+        "session": false,
+        "storeId": null,
+        "value": "{\"i_l\":0,\"i_ll\":1771419836062,\"i_b\":\"rsAgCt57qgdrssgUr6nXX6X2xnWqyT2dDENQ8AIlBvU\",\"i_e\":{\"enable_itp_optimization\":16}}"
+      },
+      {
+        "domain": ".craxpro.to",
+        "hostOnly": false,
+        "httpOnly": false,
+        "name": "xf_csrf",
+        "path": "/",
+        "sameSite": null,
+        "secure": true,
+        "session": true,
+        "storeId": null,
+        "value": "54R9jAsSfWAND3le"
+      },
+      {
+        "domain": ".craxpro.to",
+        "hostOnly": false,
+        "httpOnly": true,
+        "name": "xf_sam_ad_views",
+        "path": "/",
+        "sameSite": null,
+        "secure": true,
+        "session": true,
+        "storeId": null,
+        "value": "%7B%22164%22%3A1776343444%2C%2294%22%3A1776344160%7D"
+      },
+      {
+        "domain": ".craxpro.to",
+        "hostOnly": false,
+        "httpOnly": true,
+        "name": "xf_session",
+        "path": "/",
+        "sameSite": null,
+        "secure": true,
+        "session": true,
+        "storeId": null,
+        "value": "1ihjENyJSUrtsouOXMDl7I-ibm61PqBW"
+      }
+    ]
+  }
+]
