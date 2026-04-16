@@ -167,8 +167,8 @@ async function runAccount(browser, account) {
         }
 
         // Inject step1 only on post-thread page
-        const isPostThread = url === "https://craxpro.org/forums/proxies-http-https-socks4-socks5/post-thread" ||
-                             url.startsWith("https://craxpro.org/forums/proxies-http-https-socks4-socks5/post-thread");
+        const isPostThread = url === "https://craxpro.to/forums/proxies-http-https-socks4-socks5/post-thread" ||
+                             url.startsWith("https://craxpro.to/forums/proxies-http-https-socks4-socks5/post-thread");
 
         if (isPostThread && step1Script) {
             console.log('[runner] URL is post-thread, injecting step1');
