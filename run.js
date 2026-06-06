@@ -184,7 +184,7 @@ async function runAccount(browser, account) {
         }
 
         // Inject step2 only on threads pages
-        const isThreadsPage = /https:\/\/craxpro\.to\/threads\//.test(url);
+        const isThreadsPage = /https:\/\/craxpro\.cc\/threads\//.test(url);
 
         if (isThreadsPage && step2Script) {
             console.log('[runner] URL is threads page, injecting step2');
