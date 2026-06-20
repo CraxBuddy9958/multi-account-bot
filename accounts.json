@@ -1,22 +1,9 @@
 [
   {
     "name": "Main",
-    "startUrl": "https://craxpro.to/forums/proxies-http-https-socks4-socks5/post-thread",
+    "startUrl": "https://craxpro.cc/forums/proxies-http-https-socks4-socks5/post-thread",
     "cookies": [
-    {
-        "domain": "craxpro.cc",
-        "expirationDate": 1780470618.269608,
-        "hostOnly": true,
-        "httpOnly": true,
-        "name": "6337b3dee364e8a012545421",
-        "path": "/",
-        "sameSite": "lax",
-        "secure": false,
-        "session": false,
-        "storeId": null,
-        "value": "1780467020|45.115.107.33|8e7fb43df54a5954168d1abfe4b695e1|e3724bc63bdfc0090cee3b58853abf1239e37294e794a1232bc836ee39818880"
-    },
-    {
+      {
         "domain": ".craxpro.cc",
         "expirationDate": 1811397271.800768,
         "hostOnly": false,
@@ -28,34 +15,8 @@
         "session": false,
         "storeId": null,
         "value": "394948%2CIP6xOyoiI2wGnBsHAEvBhYshuHC7Xt44aOTxH_9m"
-    },
-    {
-        "domain": "craxpro.cc",
-        "expirationDate": 1780553410,
-        "hostOnly": true,
-        "httpOnly": false,
-        "name": "validation_time",
-        "path": "/",
-        "sameSite": null,
-        "secure": false,
-        "session": false,
-        "storeId": null,
-        "value": "Wed Jun 03 2026 11:40:10 GMT+0530 (India Standard Time)"
-    },
-    {
-        "domain": "craxpro.cc",
-        "expirationDate": 1780553410,
-        "hostOnly": true,
-        "httpOnly": false,
-        "name": "validated_bot",
-        "path": "/",
-        "sameSite": null,
-        "secure": false,
-        "session": false,
-        "storeId": null,
-        "value": "5 71560 7 22"
-    },
-    {
+      },
+      {
         "domain": "craxpro.cc",
         "expirationDate": 1795413259,
         "hostOnly": true,
@@ -67,8 +28,8 @@
         "session": false,
         "storeId": null,
         "value": "{\"i_l\":0,\"i_ll\":1779861259021,\"i_b\":\"oTyp97h6MGUxVJX0dXeMY1I+zecHN71eOMmybXk7MeE\",\"i_e\":{\"enable_itp_optimization\":0},\"i_et\":1779861255788}"
-    },
-    {
+      },
+      {
         "domain": ".craxpro.cc",
         "hostOnly": false,
         "httpOnly": false,
@@ -78,21 +39,9 @@
         "secure": true,
         "session": true,
         "storeId": null,
-        "value": "gIl63u5ySN07-Im1"
-    },
-    {
-        "domain": ".craxpro.cc",
-        "hostOnly": false,
-        "httpOnly": true,
-        "name": "xf_sam_ad_views",
-        "path": "/",
-        "sameSite": null,
-        "secure": true,
-        "session": true,
-        "storeId": null,
-        "value": "%7B%2294%22%3A1780467031%7D"
-    },
-    {
+        "value": "xiSTpn-CcTznnyjK"
+      },
+      {
         "domain": ".craxpro.cc",
         "hostOnly": false,
         "httpOnly": true,
@@ -102,8 +51,8 @@
         "secure": true,
         "session": true,
         "storeId": null,
-        "value": "FD2wuYF8-34BV_tcZxKj0Qx7bBVDf-Bt"
-    }
-]
+        "value": "RSOU-6DRGewESnxnH4OCxvSq8W50H9Qc"
+      }
+    ]
   }
 ]
