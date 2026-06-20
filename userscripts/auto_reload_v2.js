@@ -6,7 +6,7 @@
 
     // Configuration
     const CHECK_INTERVAL = 10000;      // Check every 10 seconds
-    const STUCK_THRESHOLD = 4 * 60 * 1000;  // 4 minutes in ms
+    const STUCK_THRESHOLD = 1 * 90 * 1000;  // 1 min 30 sec     minutes in ms
     const REDIRECT_URL = "https://craxpro.cc/forums/proxies-http-https-socks4-socks5/post-thread";
 
     // State tracking
