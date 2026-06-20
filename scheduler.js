@@ -13,7 +13,7 @@ const LAUNCH_MINUTE_IST = 45;    // 27 minutes = 11:27 PM IST
 const { spawn } = require('child_process');
 const fs = require('fs');
 
-const ONE_HOUR_MS = 90 * 60 * 1000;
+const ONE_HOUR_MS = 120 * 60 * 1000;
 const CYCLE_HOURS_MS = 25 * 60 * 60 * 1000;  // 25 hours
 
 function log(message) {
